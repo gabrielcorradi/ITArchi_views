@@ -1,12 +1,16 @@
-var mysql = require('mysql3');
-
-var con = mysql.createConnection({
-  host: "mysql",
-  user: "root",
-  password: "Migueletes2423"
+var mysql      = require('mysql');
+var connection = mysql.createConnection({
+  host     : 'mysql.eclipse-che.svc.cluster.local',
+  user     : 'root',
+  password : 'Migueletes2423',
+  database : 'telecom'
 });
 
-con.connect(function(err) {
-  if (err) throw err;
-  console.log("Connected!");
+connection.connect();
+
+connection.query('SELECT 1 + 1 AS solution', function (error, results, fields) {
+  if (error) throw error;
+  console.log('The solution is: ', results[0].solution);
 });
+
+connection.end();
