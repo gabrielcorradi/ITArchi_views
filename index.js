@@ -19,7 +19,6 @@ http.createServer(function (req, res) {
         case "/go.js":
             gojs(req, res);
             break;
-
         case "/read":
             read(req, res);
             break;
@@ -31,7 +30,7 @@ http.createServer(function (req, res) {
             break;
     }
 }).listen(5000);
-console.log("Server running at http://localhost:3333/");
+console.log("Server running at http://localhost:5000/");
 
 //functions to process incoming requests
 function homepage(req, res) {
@@ -46,7 +45,7 @@ function homepage(req, res) {
     });
 }
 
-async function gojs(req, res) {
+function gojs(req, res) {
     fs.readFile('./go.js', function (err, gojs) {
         if (err) {
             throw err;
@@ -58,13 +57,13 @@ async function gojs(req, res) {
 
     });
 
-
-    console.log(await mysqlfx());
-
 }
 
-function read(req, res) {
-    res.end("Hello, there is no data for reading yet.");
+async function read(req, res) {
+
+    var rta = await mysqlfx();
+    res.end(JSON.stringify(rta[0]));
+//    console.log();
 }
 
 function update(req, res) {
@@ -79,10 +78,10 @@ async function mysqlfx(){
         password : 'Migueletes2423',
         database : 'telecom'});
 
-    var result = await conn.query('select name from elements limit 2;');
+    var result = await conn.query('select name as "key" from elements where class = "ApplicationComponent" limit 10;');
     //console.log(result[0]);
     conn.end();
-    return result[0];
+    return result;
 }
 
 

@@ -13,12 +13,18 @@
 
         var myModel = $(go.Model);
 
-        myModel.nodeDataArray = [
-            { key: "Alpha" },
-            { key: "Beta" },
-            { key: "Gamma" }
-        ];
+
+        var xmlHttp = new XMLHttpRequest();
+        xmlHttp.open( "GET", "/readkey", false ); // false for synchronous request
+        xmlHttp.send( null );
+        var obj = JSON.parse(xmlHttp.responseText);
+
+        //console.log(obj);
+
+        myModel.nodeDataArray = obj;
+
         myDiagram.model = myModel;
+
 
     </script>
 
