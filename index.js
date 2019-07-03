@@ -2,7 +2,8 @@
 var http = require('http'),
     url = require('url'),
     fs = require('fs'),
-    mysql = require('mysql');
+    mysql = require('mysql2/promise'),
+    util = require('util');
 
 //create the http server accepting requests to port 3333
 http.createServer(function (req, res) {
@@ -72,22 +73,16 @@ function update(req, res) {
 
 async function mysqlfx(){
 
-    console.log("inside fx");
-try{
-    const con = await mysql.createConnection({
+    const conn = await mysql.createConnection({
         host : 'mysql.eclipse-che.svc.cluster.local',
         user : 'root',
         password : 'Migueletes2423',
         database : 'telecom'});
 
-        const result = await con.query("SELECT * FROM elements limit 3;");
-        console.log(result);
-        con.end();
-
-    }
-    catch(err){}
-
-    return "123";
+    var result = await conn.query('select name from elements limit 2;');
+    //console.log(result[0]);
+    conn.end();
+    return result[0];
 }
 
 
