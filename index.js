@@ -71,7 +71,7 @@ query_vistas_0 =    "select id as 'key', class, name, container_id as 'group', c
                         where view_id in ('4ee92239-acb9-4109-8f1e-c0a64a8f3b30') \
                     );"
 
-query_vistas_1 =    "select source_object_id, target_object_id, \
+query_vistas_1 =    "select source_object_id 'from', target_object_id 'to', \
                     (select class from relationships where id=relationship_id) rel_class, \
                     (select name from relationships where id=relationship_id)rel_name, \
                     (select documentation from relationships where id=relationship_id) rel_doc \
@@ -82,12 +82,7 @@ query_vistas_1 =    "select source_object_id, target_object_id, \
 
 
 
-
-
-
-    query1 = 'select id as "key", name from elements where class = "ApplicationComponent" limit 10;'
-
-    var rta = await mysqlfx(query0);
+    var rta = await mysqlfx(query_vistas_0);
     res.end(JSON.stringify(rta[0]));
 
 }
