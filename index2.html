@@ -14,8 +14,8 @@
 
     const columnDefs = [
         {headerName: 'id', field: 'id', hide:true },
-        {headerName: 'name', field: 'name' , resizable: true},
-        {headerName: 'documentation', field: 'documentation', editable : true, resizable: true},
+        {headerName: 'name', field: 'name' , resizable: true, sortable: true},
+        {headerName: 'documentation', field: 'documentation', editable : true, resizable: true, sortable: true},
         {headerName: 'viewpoint', field: 'viewpoint', resizable: true, sortable: true},
     ];
     const rowData = getSQL("/getview");
