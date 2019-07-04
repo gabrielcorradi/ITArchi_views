@@ -7,12 +7,13 @@
     <link rel="stylesheet" href="/node_modules/ag-grid-community/dist/styles/ag-theme-balham.css">
 </head>
 <body>
-<h1>Hello from ag-grid!</h1>
+<h1 id=selectedRows>Archi Views Telecom Model</h1>
 <div id="myGrid" style="height: 120px; width:900px;" class="ag-theme-balham"></div>
 
 <script type="text/javascript" charset="utf-8">
 
     const columnDefs = [
+        {headerName: 'id', field: 'id', hide:true },
         {headerName: 'name', field: 'name' , resizable: true},
         {headerName: 'documentation', field: 'documentation', editable : true, resizable: true},
         {headerName: 'viewpoint', field: 'viewpoint', resizable: true, sortable: true},
@@ -21,10 +22,32 @@
 
     const gridOptions = {
         columnDefs: columnDefs,
-        rowData: rowData
+        rowData: rowData,
+        rowSelection: 'single',
+        onSelectionChanged: onSelectionChanged
     };
     const eGridDiv = document.querySelector('#myGrid');
+
+
     new agGrid.Grid(eGridDiv, gridOptions);
+
+
+
+    function onSelectionChanged() {
+    var selectedRows = gridOptions.api.getSelectedRows();
+    var selectedRowsString = '';
+    selectedRows.forEach( function(selectedRow, index) {
+        if (index!==0) {
+            selectedRowsString += ', ';
+        }
+        selectedRowsString += selectedRow.id;
+    });
+    //console.log(selectedRowsString);
+    document.querySelector('#selectedRows').innerHTML = selectedRowsString;
+
+
+    }
+
 </script>
 </body>
 </html>
