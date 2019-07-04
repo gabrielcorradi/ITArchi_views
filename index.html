@@ -11,14 +11,13 @@
         var $ = go.GraphObject.make;
         var myDiagram = $(go.Diagram, "myDiagramDiv",{ "undoManager.isEnabled": true });
 
-        var myModel = $(go.GraphLinksModel);
-
         myDiagram.nodeTemplate = $(
             go.Node, "Auto",
             $(go.Shape,"RoundedRectangle",{ width: 140, height: 40, margin: 4, fill: null }),
             $(go.TextBlock, new go.Binding("text", "name"))
             );
 
+        var myModel = $(go.GraphLinksModel);
         myModel.nodeDataArray = getSQL("/read");
 
         myDiagram.model = myModel;

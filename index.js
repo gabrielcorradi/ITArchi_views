@@ -19,8 +19,11 @@ http.createServer(function (req, res) {
         case "/go.js":
             gojs(req, res);
             break;
-        case "/read":
-            read(req, res);
+        case "/getobj":
+            read(0, res);
+            break;
+        case "/getrel":
+            read(1, res);
             break;
         case "/svc/update":
             update(req, res);
@@ -59,7 +62,7 @@ function gojs(req, res) {
 
 }
 
-async function read(req, res) {
+async function read(id, res) {
 
 query_vistas_0 =    "select id as 'key', class, name, container_id as 'group', content, \
                     element_id, \
@@ -80,9 +83,12 @@ query_vistas_1 =    "select source_object_id 'from', target_object_id 'to', \
                         where view_id in ('4ee92239-acb9-4109-8f1e-c0a64a8f3b30') \
                     )";
 
+var query = [];
 
+query.push(query_vistas_0);
+query.push(query_vistas_1);
 
-    var rta = await mysqlfx(query_vistas_0);
+    var rta = await mysqlfx(query[id]);
     res.end(JSON.stringify(rta[0]));
 
 }
