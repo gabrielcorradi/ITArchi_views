@@ -11,20 +11,27 @@
         var $ = go.GraphObject.make;
         var myDiagram = $(go.Diagram, "myDiagramDiv",{ "undoManager.isEnabled": true });
 
-        var myModel = $(go.Model);
+        var myModel = $(go.GraphLinksModel);
 
+        myDiagram.nodeTemplate = $(
+            go.Node, "Auto",
+            $(go.Shape,"RoundedRectangle",{ width: 140, height: 40, margin: 4, fill: null }),
+            $(go.TextBlock, new go.Binding("text", "name"))
+            );
 
-        var xmlHttp = new XMLHttpRequest();
-        xmlHttp.open( "GET", "/readkey", false ); // false for synchronous request
-        xmlHttp.send( null );
-        var obj = JSON.parse(xmlHttp.responseText);
-
-        //console.log(obj);
-
-        myModel.nodeDataArray = obj;
+        myModel.nodeDataArray = getSQL("/read");
 
         myDiagram.model = myModel;
 
+        function getSQL(url){
+            var xmlHttp = new XMLHttpRequest();
+            xmlHttp.open( "GET", url, false ); // false for synchronous request
+            xmlHttp.send( null );
+            var obj = JSON.parse(xmlHttp.responseText);
+            console.log(obj);
+
+            return obj;
+        }
 
     </script>
 
