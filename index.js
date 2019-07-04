@@ -78,7 +78,7 @@ query_vistas_1 =    "select source_object_id, target_object_id, \
                     from views_connections vc where id in ( \
                         select connection_id from views_connections_in_view vcv  \
                         where view_id in ('4ee92239-acb9-4109-8f1e-c0a64a8f3b30') \
-                    );
+                    )";
 
 
 
