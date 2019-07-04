@@ -4,12 +4,14 @@
 </head>
    <!-- The DIV for a Diagram needs an explicit size or else we will not see anything.
     In this case we also add a background color so we can see that area. -->
-    <div id="myDiagramDiv" style="width:800px; height:300px; background-color: #DAE4E4;"></div>
+    <div id="myDiagramDiv" style="width:1500px; height:350px; background-color: #DAE4E4;"></div>
 
     <script >
 
         var $ = go.GraphObject.make;
         var myDiagram = $(go.Diagram, "myDiagramDiv",{ "undoManager.isEnabled": true });
+
+        myDiagram.layout = new go.LayeredDigraphLayout();
 
         myDiagram.nodeTemplate = $(
             go.Node, "Auto",
@@ -17,17 +19,19 @@
             $(go.TextBlock, new go.Binding("text", "name"))
             );
 
-        var myModel = $(go.GraphLinksModel);
-        myModel.nodeDataArray = getSQL("/read");
+        myDiagram.linkTemplate =
+            $(go.Link,
+            $(go.Shape)
+            );
 
-        myDiagram.model = myModel;
+        myDiagram.model = new go.GraphLinksModel(getSQL("/getobj"), getSQL("/getrel"));
 
         function getSQL(url){
             var xmlHttp = new XMLHttpRequest();
             xmlHttp.open( "GET", url, false ); // false for synchronous request
             xmlHttp.send( null );
             var obj = JSON.parse(xmlHttp.responseText);
-            console.log(obj);
+            //console.log(obj);
 
             return obj;
         }
