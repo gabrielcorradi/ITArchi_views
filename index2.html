@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="/node_modules/ag-grid-community/dist/ag-grid-community.min.noStyle.js"></script>
+    <script type="text/javascript"  src="resources-client.js" charset="UTF-8"></script>
+    <link rel="stylesheet" href="/node_modules/ag-grid-community/dist/styles/ag-grid.css">
+    <link rel="stylesheet" href="/node_modules/ag-grid-community/dist/styles/ag-theme-balham.css">
+</head>
+<body>
+<h1>Hello from ag-grid!</h1>
+<div id="myGrid" style="height: 120px; width:900px;" class="ag-theme-balham"></div>
+
+<script type="text/javascript" charset="utf-8">
+
+    const columnDefs = [
+        {headerName: 'name', field: 'name' , resizable: true},
+        {headerName: 'documentation', field: 'documentation', editable : true, resizable: true},
+        {headerName: 'viewpoint', field: 'viewpoint', resizable: true, sortable: true},
+    ];
+    const rowData = getSQL("/getview");
+
+    const gridOptions = {
+        columnDefs: columnDefs,
+        rowData: rowData
+    };
+    const eGridDiv = document.querySelector('#myGrid');
+    new agGrid.Grid(eGridDiv, gridOptions);
+</script>
+</body>
+</html>
