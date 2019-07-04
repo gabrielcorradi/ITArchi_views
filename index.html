@@ -1,17 +1,28 @@
 <html>
 <head>
     <script type="text/javascript"  src="go.js" charset="UTF-8"></script>
+    <script type="text/javascript"  src="resources-client.js" charset="UTF-8"></script>
+
 </head>
    <!-- The DIV for a Diagram needs an explicit size or else we will not see anything.
     In this case we also add a background color so we can see that area. -->
-    <div id="myDiagramDiv" style="width:1500px; height:350px; background-color: #DAE4E4;"></div>
+    <div id="myDiagramDiv" style="width:1500px; height:700px; background-color: #DAE4E4;"></div>
 
     <script >
 
         var $ = go.GraphObject.make;
         var myDiagram = $(go.Diagram, "myDiagramDiv",{ "undoManager.isEnabled": true });
 
-        myDiagram.layout = new go.LayeredDigraphLayout();
+
+/*
+    GridLayout
+    TreeLayout
+    ForceDirectedLayout
+    LayeredDigraphLayout
+    CircularLayout
+*/
+
+        myDiagram.layout = new go.CircularLayout();
 
         myDiagram.nodeTemplate = $(
             go.Node, "Auto",
@@ -24,17 +35,29 @@
             $(go.Shape)
             );
 
+        myDiagram.groupTemplate =
+        $(go.Group, "Auto", { layout: $(go.TreeLayout) , isSubGraphExpanded : false },
+            $(go.Shape, "Rectangle", { fill: "orange", stroke: "darkorange" }),
+            $(go.Panel, "Table",{ margin: 0.5 },
+                $(go.RowColumnDefinition, { row: 0, background: "white" }),
+                    $("SubGraphExpanderButton", { row: 0, column: 0, margin: 3 }),
+                $(go.TextBlock,
+                    { row: 0, column: 1,
+                    font: "bold 14px Sans-Serif",
+                    stroke: "darkorange",
+                    textAlign: "center",
+                    stretch: go.GraphObject.Horizontal },
+                    new go.Binding("text", "name")),
+                $(go.Placeholder,
+                    { row: 1, columnSpan: 2,
+                    padding: 10, alignment: go.Spot.TopLeft },
+                    new go.Binding("padding", "isSubGraphExpanded", function(exp) { return exp ? 10 : 0; } ).ofObject())
+            )
+        );
+
         myDiagram.model = new go.GraphLinksModel(getSQL("/getobj"), getSQL("/getrel"));
 
-        function getSQL(url){
-            var xmlHttp = new XMLHttpRequest();
-            xmlHttp.open( "GET", url, false ); // false for synchronous request
-            xmlHttp.send( null );
-            var obj = JSON.parse(xmlHttp.responseText);
-            //console.log(obj);
 
-            return obj;
-        }
 
     </script>
 
