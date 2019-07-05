@@ -13,7 +13,6 @@
         var $ = go.GraphObject.make;
         var myDiagram = $(go.Diagram, "myDiagramDiv",{ "undoManager.isEnabled": true });
 
-
 /*
     GridLayout
     TreeLayout
@@ -22,7 +21,7 @@
     CircularLayout
 */
 
-        myDiagram.layout = new go.CircularLayout();
+        myDiagram.layout = new go.LayeredDigraphLayout();
 
         myDiagram.nodeTemplate = $(
             go.Node, "Auto",
