@@ -21,7 +21,6 @@ module.exports = {
 
   read: async function (params, res ) {
 
-
     //, 'true' isGroup
     //, if(container_id='"+ params.view +"','true', 'false') 'isGroup'
     query_vistas_0 =    "select id as 'key', \
@@ -55,8 +54,9 @@ module.exports = {
         var rta = await this.mysqlfx(query[params.id]);
 
         if(params.id==0) rta[0] = defgroups(rta[0], params.view);
+        //if(params.id==1) rta[0] = deflinks(rta[0]);
 
-        console.log(JSON.stringify(rta[0]));
+       // console.log(JSON.stringify(rta[0]));
         res.end(JSON.stringify( rta[0] ));
   },
 
@@ -125,8 +125,8 @@ var defgroups = function (rta, view) {
       rta[key].x += rta2.x;
       rta[key].y += rta2.y;
 
-      console.log("name\t"  + rta[key].name + "x=\t"  + rta[key].x + "\ty=\t"  + rta[key].y );
-      console.log("x\t"  + rta2.x + "y=\t"  + rta2.y)
+      //console.log("name\t"  + rta[key].name + "x=\t"  + rta[key].x + "\ty=\t"  + rta[key].y );
+      //console.log("x\t"  + rta2.x + "y=\t"  + rta2.y)
     }
     
 
@@ -151,4 +151,10 @@ var defgroups = function (rta, view) {
 
   }
 
+}
+
+var deflinks = function (rta) {
+  for (var key in rta) {
+
+  }
 }

@@ -11,8 +11,8 @@ http.createServer(function (req, res) {
 
     var params = url.parse(req.url,true).query;
 
-    console.log(urlParts.pathname);
-    console.log(params);
+    //console.log(urlParts.pathname);
+    //console.log(params);
 
     //direct the request to appropriate function to be processed based on the url pathname
     switch(urlParts.pathname) {
