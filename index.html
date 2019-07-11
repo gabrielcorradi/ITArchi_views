@@ -3,10 +3,25 @@
     <script type="text/javascript"  src="go.js" charset="UTF-8"></script>
     <script type="text/javascript"  src="resources-client.js" charset="UTF-8"></script>
 
+    <script src="/node_modules/ag-grid-community/dist/ag-grid-community.min.noStyle.js"></script>
+    <script type="text/javascript"  src="resources-client.js" charset="UTF-8"></script>
+    <link rel="stylesheet" href="/node_modules/ag-grid-community/dist/styles/ag-grid.css">
+    <link rel="stylesheet" href="/node_modules/ag-grid-community/dist/styles/ag-theme-balham.css">
+
 </head>
-   <!-- The DIV for a Diagram needs an explicit size or else we will not see anything.
-    In this case we also add a background color so we can see that area. -->
-    <div id="myDiagramDiv" style="width:1500px; height:700px; background-color: #DAE4E4;"></div>
+
+    <h1 id=selectedRows>Archi Views Telecom Model</h1>
+
+    <div style="width: 100%; display: table;">
+        <div style="display: table-row">
+            <div id="myGrid" style="height: 120px; width:900px; display: table-cell;" class="ag-theme-balham"></div>
+            <div style="height: 120px; width:300px; display: table-cell;">
+                <button id="loadbutton" onclick="LoadDiagram()" disabled>Load Diagram</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="myDiagramDiv" style="width:1900px; height:700px; background-color: #DAE4E4;"></div>
 
     <script >
 
@@ -21,43 +36,131 @@
     CircularLayout
 */
 
-        myDiagram.layout = new go.LayeredDigraphLayout();
+        //myDiagram.layout = new go.LayeredDigraphLayout();
 
         myDiagram.nodeTemplate = $(
-            go.Node, "Auto",
-            $(go.Shape,"RoundedRectangle",{ width: 140, height: 40, margin: 4, fill: null }),
-            $(go.TextBlock, new go.Binding("text", "name"))
+            go.Node, new go.Binding("location", "loc", go.Point.parse),
+
+            { click: function(e, node) {
+                var diagram = node.diagram;
+                diagram.startTransaction("highlight");
+                diagram.clearHighlighteds();
+                node.findLinksOutOf().each(function(l) { l.isHighlighted = true; });
+                node.findNodesOutOf().each(function(n) { n.isHighlighted = true; });
+                diagram.commitTransaction("highlight");}
+            },
+
+            $(go.Shape,"RoundedRectangle",
+
+               // the Shape.stroke color depends on whether Node.isHighlighted is true
+               new go.Binding("stroke", "isHighlighted", function(h) { return h ? "red" : "black"; }).ofObject(),
+               new go.Binding("opacity", "isHighlighted", function(h) { return h ? 1 : 0.3; }).ofObject(),
+
+                { parameter1: 14, fill: "rgba(128,128,128,0.33)" },
+                new go.Binding("desiredSize", "size", go.Size.parse).makeTwoWay(go.Size.stringify) ),
+            $(go.TextBlock, new go.Binding("text", "name"), { width: 100, wrap: go.TextBlock.WrapFit , textAlign: "center", margin: 5 } )
             );
 
-        myDiagram.linkTemplate =
-            $(go.Link,
-            $(go.Shape)
-            );
+            myDiagram.linkTemplate = $(go.Link,
+                                        { routing: go.Link.AvoidsNodes, corner: 10, curve: go.Link.JumpOver },
+                                        $(go.Shape, 
+                                            new go.Binding("stroke", "isHighlighted", function(h) { return h ? "red" : "black"; }).ofObject(),
+                                            new go.Binding("strokeWidth", "isHighlighted", function(h) { return h ? 3 : 1; }).ofObject(),
+                                            new go.Binding("opacity", "isHighlighted", function(h) { return h ? 1 : 0.3; }).ofObject()
+                                         ),
+                                        $(go.Shape, { toArrow: "Standard" }),
+                                        $(go.TextBlock, new go.Binding("text", "rel_name"),  { opacity: 0.5 } )
+                                    );
 
-        myDiagram.groupTemplate =
-        $(go.Group, "Auto", { layout: $(go.TreeLayout) , isSubGraphExpanded : false },
-            $(go.Shape, "Rectangle", { fill: "orange", stroke: "darkorange" }),
-            $(go.Panel, "Table",{ margin: 0.5 },
-                $(go.RowColumnDefinition, { row: 0, background: "white" }),
-                    $("SubGraphExpanderButton", { row: 0, column: 0, margin: 3 }),
-                $(go.TextBlock,
-                    { row: 0, column: 1,
-                    font: "bold 14px Sans-Serif",
-                    stroke: "darkorange",
-                    textAlign: "center",
-                    stretch: go.GraphObject.Horizontal },
-                    new go.Binding("text", "name")),
-                $(go.Placeholder,
-                    { row: 1, columnSpan: 2,
-                    padding: 10, alignment: go.Spot.TopLeft },
-                    new go.Binding("padding", "isSubGraphExpanded", function(exp) { return exp ? 10 : 0; } ).ofObject())
+
+
+        myDiagram.groupTemplate =   $(go.Group, "Vertical", 
+                                        { selectionObjectName: "PH", locationObjectName: "PH", resizable: true, resizeObjectName: "PH" },
+                                        new go.Binding("location", "loc", go.Point.parse).makeTwoWay(go.Point.stringify),
+                                        $(go.TextBlock, { font: "Bold 10pt Sans-Serif", width: 110, wrap: go.TextBlock.WrapFit }, new go.Binding("text", "name")),
+                                        $(go.Shape, { name: "PH", fill: "lightyellow" }, new go.Binding("desiredSize", "size", go.Size.parse).makeTwoWay(go.Size.stringify))
+                                    );
+
+         myDiagram.click = function(e) {e.diagram.commit(function(d) { d.clearHighlighteds(); }, "no highlighteds");};
+         
+        /*
+        myDiagram.groupTemplate =   $(go.Group, "Vertical",  
+                                        new go.Binding("location", "loc", go.Point.parse).makeTwoWay(go.Point.stringify),
+                                        $(go.Panel, "Auto",
+                                            $(go.Shape, "RoundedRectangle", { parameter1: 14, fill: "rgba(128,128,128,0.33)" }),
+                                            $(go.Placeholder, { padding: 5})
+                                        ),
+                                        new go.Binding("desiredSize", "size", go.Size.parse).makeTwoWay(go.Size.stringify),
+                                        $(go.TextBlock, { alignment: go.Spot.Right, font: "Bold 12pt Sans-Serif" }, new go.Binding("text", "loc"))
+                                    );
+        */
+
+
+        //myDiagram.model = new go.GraphLinksModel(getSQL("/getobj"), getSQL("/getrel"));
+
+        
+
+    </script>
+
+    <script type="text/javascript" charset="utf-8">
+
+        var selectedRowsString = '';
+
+        const columnDefs = [
+            {headerName: 'id', field: 'id', hide:true },
+            {headerName: 'name', field: 'name' , resizable: true, sortable: true},
+            {headerName: 'documentation', field: 'documentation', editable : true, resizable: true, sortable: true},
+            {headerName: 'viewpoint', field: 'viewpoint', resizable: true, sortable: true},
+        ];
+        const rowData = getSQL("/get?id=2");
+
+        const gridOptions = {
+            columnDefs: columnDefs,
+            rowData: rowData,
+            rowSelection: 'single',
+            onSelectionChanged: onSelectionChanged
+        };
+        const eGridDiv = document.querySelector('#myGrid');
+
+
+        new agGrid.Grid(eGridDiv, gridOptions);
+
+        function onSelectionChanged() {
+        var selectedRows = gridOptions.api.getSelectedRows();
+
+        selectedRows.forEach( function(selectedRow, index) {
+           /* 
+           if (index!==0) {
+                selectedRowsString += ', ';
+            }
+            selectedRowsString += selectedRow.id;
+            */
+            selectedRowsString = selectedRow.id;
+
+            document.querySelector('#selectedRows').innerHTML = selectedRow.name;
+        });
+        //console.log(selectedRowsString);
+        document.getElementById("loadbutton").disabled = false;
+       
+
+
+        }
+
+    </script>
+
+    <script type="text/javascript" charset="utf-8">
+        function LoadDiagram(){
+            document.getElementById("loadbutton").disabled = true;
+            myDiagram.model = new go.GraphLinksModel(getSQL("/get?id=0&view=" + selectedRowsString), getSQL("/get?id=1&view=" + selectedRowsString));
+            document.getElementById("loadbutton").disabled = false;
+
+            myDiagram.model.Fc.forEach(
+                function(e){
+                    console.log(e.loc + "\t" + e.name + "\t" + e.isGroup);}
             )
-        );
-
-        myDiagram.model = new go.GraphLinksModel(getSQL("/getobj"), getSQL("/getrel"));
 
 
-
+        }
     </script>
 
 </html>

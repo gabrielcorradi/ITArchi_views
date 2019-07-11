@@ -17,15 +17,22 @@ module.exports = {
     });
   },
 
-  read: async function (id, res) {
-    query_vistas_0 =    "select id as 'key', 'true' isGroup, class, name, container_id as 'group', content, \
-                        element_id, \
+
+
+  read: async function (params, res ) {
+
+
+    //, 'true' isGroup
+    //, if(container_id='"+ params.view +"','true', 'false') 'isGroup'
+    query_vistas_0 =    "select id as 'key', \
+                        class, name, container_id as 'group', content, element_id, \
                         (select class from elements where id=element_id) element_class, \
-                        (select name from elements where id=element_id) element_name \
+                        (select name from elements where id=element_id) element_name, \
+                        x, y , CONCAT(`width`, ' ', `height`) size \
                         from views_objects vo where id in ( \
                             select object_id \
                             from views_objects_in_view vov \
-                            where view_id in ('4ee92239-acb9-4109-8f1e-c0a64a8f3b30') \
+                            where view_id in ('"+ params.view +"') \
                         );"
 
     query_vistas_1 =    "select source_object_id 'from', target_object_id 'to', \
@@ -34,7 +41,7 @@ module.exports = {
                         (select documentation from relationships where id=relationship_id) rel_doc \
                         from views_connections vc where id in ( \
                             select connection_id from views_connections_in_view vcv  \
-                            where view_id in ('4ee92239-acb9-4109-8f1e-c0a64a8f3b30') \
+                            where view_id in ('"+ params.view +"') \
                         )";
 
     query_vistas_2 =    "select id, name, documentation, viewpoint from views;"
@@ -45,8 +52,12 @@ module.exports = {
         query.push(query_vistas_1);
         query.push(query_vistas_2);
 
-        var rta = await this.mysqlfx(query[id]);
-        res.end(JSON.stringify(rta[0]));
+        var rta = await this.mysqlfx(query[params.id]);
+
+        if(params.id==0) rta[0] = defgroups(rta[0], params.view);
+
+        console.log(JSON.stringify(rta[0]));
+        res.end(JSON.stringify( rta[0] ));
   },
 
   mysqlfx: async function(SQLquery){
@@ -95,5 +106,49 @@ module.exports = {
 
 };
 
-var demo = function () {
+var defgroups = function (rta, view) {
+
+  for (var key in rta) {
+
+    
+    //if (rta[key].group == view) rta[key].isGroup = true;
+    
+    for (var key2 in rta) {
+      if (rta[key].key == rta[key2].group) { rta[key].isGroup = true; break; }
+    }
+    
+
+
+    
+    if (rta[key].group != view){ 
+      rta2 = fixloc(rta[key])
+      rta[key].x += rta2.x;
+      rta[key].y += rta2.y;
+
+      console.log("name\t"  + rta[key].name + "x=\t"  + rta[key].x + "\ty=\t"  + rta[key].y );
+      console.log("x\t"  + rta2.x + "y=\t"  + rta2.y)
+    }
+    
+
+    rta[key].loc = rta[key].x + " " + rta[key].y
+
+    ///////// Fix Note Content
+    if(rta[key].class == "DiagramModelNote") rta[key].name = rta[key].content;
+
+
+  }
+
+
+
+  return rta;
+
+  function fixloc(i){
+    rta2 = {}
+    for (var key in rta) {
+      if (rta[key].key == i.group) { rta2["x"] = rta[key].x; rta2["y"] = rta[key].y; break}
+    }
+    return rta2;
+
+  }
+
 }
