@@ -17,8 +17,6 @@ module.exports = {
     });
   },
 
-
-
   read: async function (params, res ) {
 
     //, 'true' isGroup
@@ -37,7 +35,9 @@ module.exports = {
     query_vistas_1 =    "select source_object_id 'from', target_object_id 'to', \
                         (select class from relationships where id=relationship_id) rel_class, \
                         (select name from relationships where id=relationship_id)rel_name, \
-                        (select documentation from relationships where id=relationship_id) rel_doc \
+                        (select documentation from relationships where id=relationship_id) rel_doc, \
+                        (SELECT container_id FROM views_objects WHERE id=vc.source_object_id) from_grp, \
+                        (SELECT container_id FROM views_objects WHERE id=vc.target_object_id) to_grp \
                         from views_connections vc where id in ( \
                             select connection_id from views_connections_in_view vcv  \
                             where view_id in ('"+ params.view +"') \
@@ -54,9 +54,9 @@ module.exports = {
         var rta = await this.mysqlfx(query[params.id]);
 
         if(params.id==0) rta[0] = defgroups(rta[0], params.view);
-        //if(params.id==1) rta[0] = deflinks(rta[0]);
+        if(params.id==1) rta[0] = deflinks(rta[0]);
 
-       // console.log(JSON.stringify(rta[0]));
+        //console.log(JSON.stringify(rta[0]));
         res.end(JSON.stringify( rta[0] ));
   },
 
@@ -154,7 +154,14 @@ var defgroups = function (rta, view) {
 }
 
 var deflinks = function (rta) {
-  for (var key in rta) {
+
+  for (var key = rta.length - 1; key >= 0; --key) {
+
+    if (rta[key].from == rta[key].to_grp) rta.splice(key, 1);
+    if (rta[key].to == rta[key].from_grp) rta.splice(key, 1);
 
   }
+
+  return rta;
+
 }

@@ -41,16 +41,19 @@
         myDiagram.nodeTemplate = $(
             go.Node, new go.Binding("location", "loc", go.Point.parse),
 
+
             { click: function(e, node) {
                 var diagram = node.diagram;
                 diagram.startTransaction("highlight");
                 diagram.clearHighlighteds();
                 node.findLinksOutOf().each(function(l) { l.isHighlighted = true; });
+                node.findLinksInto().each(function(l) { l.isHighlighted = true; });
                 node.findNodesOutOf().each(function(n) { n.isHighlighted = true; });
+                node.findNodesInto().each(function(n) { n.isHighlighted = true; });
                 diagram.commitTransaction("highlight");}
             },
 
-            $(go.Shape,"RoundedRectangle",
+            $(go.Shape, new go.Binding("figure", selectnode ),
 
                // the Shape.stroke color depends on whether Node.isHighlighted is true
                new go.Binding("stroke", "isHighlighted", function(h) { return h ? "red" : "black"; }).ofObject(),
@@ -69,9 +72,12 @@
                                             new go.Binding("opacity", "isHighlighted", function(h) { return h ? 1 : 0.3; }).ofObject()
                                          ),
                                         $(go.Shape, { toArrow: "Standard" }),
-                                        $(go.TextBlock, new go.Binding("text", "rel_name"),  { opacity: 0.5 } )
+                                        $(go.TextBlock, new go.Binding("text", "rel_name"),
+                                            new go.Binding("stroke", "isHighlighted", function(h) { return h ? "red" : "black"; }).ofObject(),
+                                            //new go.Binding("strokeWidth", "isHighlighted", function(h) { return h ? 3 : 1; }).ofObject(),
+                                            new go.Binding("opacity", "isHighlighted", function(h) { return h ? 1 : 0.3; }).ofObject()
+                                        )
                                     );
-
 
 
              myDiagram.groupTemplate =   $(go.Group, "Vertical", 
@@ -111,7 +117,32 @@
 
         //myDiagram.model = new go.GraphLinksModel(getSQL("/getobj"), getSQL("/getrel"));
 
+
+
+        function selectnode(node) { 
+
+            var rta;
+            switch(node.element_class) {
+                case "ApplicationComponent":
+                    rta = "Rectangle" ;
+                    break;
+
+                case "WorkPackage":
+                    rta = "Ellipse" ;
+                    break;
+
+                case "ImplementationEvent":
+                    rta = "Diamond" ;
+                    break;
         
+                default:
+                rta = "Rectangle" ;
+                    break;
+            }
+            return rta;
+
+        }
+
 
     </script>
 
@@ -150,7 +181,7 @@
             */
             selectedRowsString = selectedRow.id;
 
-            document.querySelector('#selectedRows').innerHTML = selectedRow.name;
+            document.querySelector('#selectedRows').innerHTML = selectedRow.id;
         });
         //console.log(selectedRowsString);
         document.getElementById("loadbutton").disabled = false;
@@ -167,11 +198,12 @@
             myDiagram.model = new go.GraphLinksModel(getSQL("/get?id=0&view=" + selectedRowsString), getSQL("/get?id=1&view=" + selectedRowsString));
             document.getElementById("loadbutton").disabled = false;
 
+            /*
             myDiagram.model.Fc.forEach(
                 function(e){
                     console.log(e.loc + "\t" + e.name + "\t" + e.isGroup);}
             )
-
+            */
 
         }
     </script>
