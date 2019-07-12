@@ -56,7 +56,7 @@ module.exports = {
         if(params.id==0) rta[0] = defgroups(rta[0], params.view);
         if(params.id==1) rta[0] = deflinks(rta[0]);
 
-        //console.log(JSON.stringify(rta[0]));
+        console.log(JSON.stringify(rta[0]));
         res.end(JSON.stringify( rta[0] ));
   },
 
@@ -157,8 +157,8 @@ var deflinks = function (rta) {
 
   for (var key = rta.length - 1; key >= 0; --key) {
 
-    if (rta[key].from == rta[key].to_grp) rta.splice(key, 1);
-    if (rta[key].to == rta[key].from_grp) rta.splice(key, 1);
+    if (rta[key].from == rta[key].to_grp) { rta.splice(key, 1); continue; }
+    if (rta[key].to == rta[key].from_grp) { rta.splice(key, 1); continue; }
 
   }
 

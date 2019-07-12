@@ -1,6 +1,8 @@
 <html>
 <head>
     <script type="text/javascript"  src="/node_modules/gojs/release/go.js" charset="UTF-8"></script>
+    <script type="text/javascript"  src="/node_modules/gojs/extensions/Figures.js" charset="UTF-8"></script>
+
     <script type="text/javascript"  src="resources-client.js" charset="UTF-8"></script>
 
     <script src="/node_modules/ag-grid-community/dist/ag-grid-community.min.noStyle.js"></script>
@@ -41,7 +43,6 @@
         myDiagram.nodeTemplate = $(
             go.Node, new go.Binding("location", "loc", go.Point.parse),
 
-
             { click: function(e, node) {
                 var diagram = node.diagram;
                 diagram.startTransaction("highlight");
@@ -53,39 +54,49 @@
                 diagram.commitTransaction("highlight");}
             },
 
-            $(go.Shape, new go.Binding("figure", selectnode ),
+            $(go.Shape, new go.Binding("figure", selectfig ),
 
-               // the Shape.stroke color depends on whether Node.isHighlighted is true
-               new go.Binding("stroke", "isHighlighted", function(h) { return h ? "red" : "black"; }).ofObject(),
-               new go.Binding("opacity", "isHighlighted", function(h) { return h ? 1 : 0.3; }).ofObject(),
+                new go.Binding("fill", selectstroke ),
 
-                { parameter1: 14, fill: "rgba(128,128,128,0.33)" },
+                // the Shape.stroke color depends on whether Node.isHighlighted is true
+                //new go.Binding("stroke", "isHighlighted", function(h) { return h ? "red" : "black"; }).ofObject(),
+                new go.Binding("strokeWidth", "isHighlighted", function(h) { return h ? 3 : 1; }).ofObject(),
+                new go.Binding("opacity", "isHighlighted", function(h) { return h ? 1 : 0.5; }).ofObject(),
+
+               // { parameter1: 14, fill: "rgba(128,128,128,0.33)" },
                 new go.Binding("desiredSize", "size", go.Size.parse).makeTwoWay(go.Size.stringify) ),
-            $(go.TextBlock, new go.Binding("text", "name"), { width: 100, wrap: go.TextBlock.WrapFit , textAlign: "center", margin: 5 } )
+            $(go.TextBlock, new go.Binding("text", "name"), { width: 100, wrap: go.TextBlock.WrapFit , textAlign: "center", margin: 5 } ),
+
+            { toolTip: $("ToolTip", $(go.TextBlock, { margin: 4 }, new go.Binding("text", "element_class")))}
+
             );
 
             myDiagram.linkTemplate = $(go.Link,
                                         { routing: go.Link.AvoidsNodes, corner: 10, curve: go.Link.JumpOver },
                                         $(go.Shape, 
-                                            new go.Binding("stroke", "isHighlighted", function(h) { return h ? "red" : "black"; }).ofObject(),
+                                          //  new go.Binding("stroke", "isHighlighted", function(h) { return h ? "red" : "black"; }).ofObject(),
                                             new go.Binding("strokeWidth", "isHighlighted", function(h) { return h ? 3 : 1; }).ofObject(),
-                                            new go.Binding("opacity", "isHighlighted", function(h) { return h ? 1 : 0.3; }).ofObject()
+                                            new go.Binding("opacity", "isHighlighted", function(h) { return h ? 0.5 : 0.3; }).ofObject()
                                          ),
                                         $(go.Shape, { toArrow: "Standard" }),
-                                        $(go.TextBlock, new go.Binding("text", "rel_name"),
-                                            new go.Binding("stroke", "isHighlighted", function(h) { return h ? "red" : "black"; }).ofObject(),
-                                            //new go.Binding("strokeWidth", "isHighlighted", function(h) { return h ? 3 : 1; }).ofObject(),
-                                            new go.Binding("opacity", "isHighlighted", function(h) { return h ? 1 : 0.3; }).ofObject()
+                                        $(go.TextBlock, new go.Binding("text", "rel_name"), {font: "Bold 11pt Sans-Serif"},
+                                            //new go.Binding("stroke", "isHighlighted", function(h) { return h ? "red" : "black"; }).ofObject(),
+                                            new go.Binding("strokeWidth", "isHighlighted", function(h) { return h ? 3 : 1; }).ofObject(),
+                                            new go.Binding("opacity", "isHighlighted", function(h) { return h ? 1 : 0.2; }).ofObject()
                                         )
                                     );
 
 
              myDiagram.groupTemplate =   $(go.Group, "Vertical", 
                                         { selectionObjectName: "PH", locationObjectName: "PH", resizable: true, resizeObjectName: "PH" },
-                                        $(go.TextBlock, { font: "Bold 10pt Sans-Serif", width: 110, wrap: go.TextBlock.WrapFit }, new go.Binding("text", "name")),
+                                        $(go.TextBlock, { font: "Bold 10pt Sans-Serif", width: 120, wrap: go.TextBlock.WrapFit }, new go.Binding("text", "name")),
                                         new go.Binding("location", "loc", go.Point.parse).makeTwoWay(go.Point.stringify),
-                                        $(go.Shape, { name: "PH", fill: "lightyellow" }, new go.Binding("desiredSize", "size", go.Size.parse).makeTwoWay(go.Size.stringify)),
-                                        
+                                        $(go.Shape, { name: "PH" }, 
+                                            new go.Binding("desiredSize", "size", go.Size.parse).makeTwoWay(go.Size.stringify),
+                                            new go.Binding("figure", selectfig ),
+                                            new go.Binding("fill", selectstroke ),
+                                            { toolTip: $("ToolTip", $(go.TextBlock, { margin: 4 }, new go.Binding("text", "element_class")))}
+                                        )
                                     );
 
 
@@ -117,30 +128,89 @@
 
         //myDiagram.model = new go.GraphLinksModel(getSQL("/getobj"), getSQL("/getrel"));
 
-
-
-        function selectnode(node) { 
+        function selectstroke(node) {
 
             var rta;
             switch(node.element_class) {
                 case "ApplicationComponent":
-                    rta = "Rectangle" ;
-                    break;
+                case "ApplicationInterface":
+                case "ApplicationService":
+                case "ImplementationEvent":
+                case "Junction":
+                    rta = "rgba(65, 218, 197 ,0.80)"; break;    // celeste
 
                 case "WorkPackage":
-                    rta = "Ellipse" ;
-                    break;
+                    rta = "rgba(240, 95, 128 ,0.80)"; break;    // rosa
+
+                case null:
+                    rta = "rgba(255, 255, 255, 0.5)"; break;    // blanco
+
+                case "BusinessActor":
+                case "BusinessInterface":
+                case "BusinessProcess":
+                case "BusinessObject":
+                case "BusinessEvent":
+                case "BusinessInteraction":
+                    rta =  "rgba(255, 255, 100, 0.8)"; break;   // amarillo
+
+                default:
+                    rta = "rgba(128, 218, 65,0.50)"; break;     // verde
+            }
+
+            return rta;
+            
+        }
+
+
+        function selectfig(node) { 
+
+            var rta;
+            switch(node.element_class) {
+//                case "ApplicationComponent":
+//                    rta = "Component"; break;
+                case "ApplicationService":
+                    rta = "PrimitiveToCall"; break;
+
+                case "TechnologyService":
+                    rta = "DividedEvent"; break;
+
+                case "TechnologyFunction":
+                    rta = "ExternalProcess"; break;
+
+                case "ApplicationInterface":
+                case "BusinessInterface":
+                    rta = "TriangleRight"; break;
+
+//              case "WorkPackage":
+//                  rta = "RoundedRectangle"; break;
 
                 case "ImplementationEvent":
-                    rta = "Diamond" ;
-                    break;
-        
-                default:
-                rta = "Rectangle" ;
-                    break;
-            }
-            return rta;
+                    rta = "DataStorage"; break;
 
+                case "Junction":
+                    rta = "Connector"; break;
+
+                case null:
+                    if (node.class == "DiagramModelNote") { rta = "Package"; break; }
+//                    if (node.class == "DiagramModelGroup") { rta = "RoundedRectangle"; break; }
+
+                case "ImplementationEvent":
+                    rta = ""; break;
+
+                case "BusinessActor":
+                    rta = "BpmnTaskUser"; break;
+
+                case "BusinessObject":
+                    rta = "DividedProcess"; break;
+
+                case "Node":
+                    rta = "Cube2"; break;
+
+                default:
+                    rta = "RoundedRectangle"; break;
+            }
+
+            return rta;
         }
 
 
@@ -181,7 +251,7 @@
             */
             selectedRowsString = selectedRow.id;
 
-            document.querySelector('#selectedRows').innerHTML = selectedRow.id;
+            document.querySelector('#selectedRows').innerHTML = selectedRow.name;
         });
         //console.log(selectedRowsString);
         document.getElementById("loadbutton").disabled = false;
