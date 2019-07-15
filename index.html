@@ -41,7 +41,11 @@
         //myDiagram.layout = new go.LayeredDigraphLayout();
 
         myDiagram.nodeTemplate = $(
-            go.Node, new go.Binding("location", "loc", go.Point.parse),
+            go.Node, 
+            { fromSpot: go.Spot.AllSides, toSpot: go.Spot.AllSides }, 
+            
+            new go.Binding("location", "loc", go.Point.parse),
+            
 
             { click: function(e, node) {
                 var diagram = node.diagram;
@@ -51,6 +55,7 @@
                 node.findLinksInto().each(function(l) { l.isHighlighted = true; });
                 node.findNodesOutOf().each(function(n) { n.isHighlighted = true; });
                 node.findNodesInto().each(function(n) { n.isHighlighted = true; });
+                node.isHighlighted = true;
                 diagram.commitTransaction("highlight");}
             },
 
@@ -65,22 +70,29 @@
 
                // { parameter1: 14, fill: "rgba(128,128,128,0.33)" },
                 new go.Binding("desiredSize", "size", go.Size.parse).makeTwoWay(go.Size.stringify) ),
-            $(go.TextBlock, new go.Binding("text", "name"), { width: 100, wrap: go.TextBlock.WrapFit , textAlign: "center", margin: 5 } ),
+            $(go.TextBlock, new go.Binding("text", "name"), { width: 100, wrap: go.TextBlock.WrapDesiredSize,
+             textAlign: "center", verticalAlignment: go.Spot.Center, margin: 1 ,isMultiline: true} ),
 
             { toolTip: $("ToolTip", $(go.TextBlock, { margin: 4 }, new go.Binding("text", "element_class")))}
 
             );
 
             myDiagram.linkTemplate = $(go.Link,
+
                                         { routing: go.Link.AvoidsNodes, corner: 10, curve: go.Link.JumpOver },
                                         $(go.Shape, 
                                           //  new go.Binding("stroke", "isHighlighted", function(h) { return h ? "red" : "black"; }).ofObject(),
                                             new go.Binding("strokeWidth", "isHighlighted", function(h) { return h ? 3 : 1; }).ofObject(),
                                             new go.Binding("opacity", "isHighlighted", function(h) { return h ? 0.5 : 0.3; }).ofObject()
                                          ),
-                                        $(go.Shape, { toArrow: "Standard" }),
-                                        $(go.TextBlock, new go.Binding("text", "rel_name"), {font: "Bold 11pt Sans-Serif"},
+                                        $(go.Shape, { toArrow: "Standard" },
+                                            new go.Binding("strokeWidth", "isHighlighted", function(h) { return h ? 3 : 1; }).ofObject(),
+                                            new go.Binding("opacity", "isHighlighted", function(h) { return h ? 0.5 : 0.3; }).ofObject()
+                                        ),
+                                        $(go.TextBlock, new go.Binding("text", "rel_name"), {font: "10pt Courier New"},
+                                        //{  segmentOrientation: go.Link.OrientAlong, width: 200, wrap: go.TextBlock.WrapDesiredSize, textAlign: "center", verticalAlignment: go.Spot.Center, margin: 1 ,isMultiline: true},
                                             //new go.Binding("stroke", "isHighlighted", function(h) { return h ? "red" : "black"; }).ofObject(),
+                                            //new go.Binding("font", "isHighlighted", function(h) { return h ? "11pt Courier New" : "9pt Courier New"; }).ofObject(),
                                             new go.Binding("strokeWidth", "isHighlighted", function(h) { return h ? 3 : 1; }).ofObject(),
                                             new go.Binding("opacity", "isHighlighted", function(h) { return h ? 1 : 0.2; }).ofObject()
                                         )
@@ -89,7 +101,7 @@
 
              myDiagram.groupTemplate =   $(go.Group, "Vertical", 
                                         { selectionObjectName: "PH", locationObjectName: "PH", resizable: true, resizeObjectName: "PH" },
-                                        $(go.TextBlock, { font: "Bold 10pt Sans-Serif", width: 120, wrap: go.TextBlock.WrapFit }, new go.Binding("text", "name")),
+                                        $(go.TextBlock, { font: "Bold 10pt Sans-Serif", width: 300, wrap: go.TextBlock.WrapFit }, new go.Binding("text", "name")),
                                         new go.Binding("location", "loc", go.Point.parse).makeTwoWay(go.Point.stringify),
                                         $(go.Shape, { name: "PH" }, 
                                             new go.Binding("desiredSize", "size", go.Size.parse).makeTwoWay(go.Size.stringify),
