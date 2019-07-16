@@ -45,18 +45,26 @@ module.exports = {
 
     query_vistas_2 =    "select id, name, documentation, viewpoint from views;"
 
+
+    query_vistas_3 =    "select id, name, documentation, viewpoint, \
+                        (select name from folders where vim.parent_folder_id=id) folder \
+                        from views v, views_in_model vim \
+                        where v.id = vim.view_id;"
+
         var query = [];
 
         query.push(query_vistas_0);
         query.push(query_vistas_1);
         query.push(query_vistas_2);
+        query.push(query_vistas_3);
+
 
         var rta = await this.mysqlfx(query[params.id]);
 
         if(params.id==0) rta[0] = defgroups(rta[0], params.view);
         if(params.id==1) rta[0] = deflinks(rta[0]);
 
-        console.log(JSON.stringify(rta[0]));
+       // console.log(JSON.stringify(rta[0]));
         res.end(JSON.stringify( rta[0] ));
   },
 
@@ -79,9 +87,9 @@ module.exports = {
 
   test_res:function(req, res){
 
-    mtype = mime.getType("." + req.url);
+    mtype = mime.getType(req.url);
 
-    fs.readFile("."+ req.url, function (err, html) {
+    fs.readFile('.' + req.url, function (err, html) {
         if (err) {
             throw err;
         }

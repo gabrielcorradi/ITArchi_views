@@ -1,53 +1,58 @@
 <!DOCTYPE html>
-<html>
-<head>
-    <script src="/node_modules/ag-grid-community/dist/ag-grid-community.min.noStyle.js"></script>
-    <script type="text/javascript"  src="resources-client.js" charset="UTF-8"></script>
-    <link rel="stylesheet" href="/node_modules/ag-grid-community/dist/styles/ag-grid.css">
-    <link rel="stylesheet" href="/node_modules/ag-grid-community/dist/styles/ag-theme-balham.css">
-</head>
+<html lang="en">
+    <head>
+        <script> var __basePath = ''; </script>
+        <style> html, body { margin: 0; padding: 0; height: 100%; } </style>
+        <script src="/node_modules/ag-grid-enterprise/dist/ag-grid-enterprise.min.js"></script>
+        <!--script src="https://unpkg.com/ag-grid-enterprise@21.0.1/dist/ag-grid-enterprise.min.js"></script-->
+        <script type="text/javascript"  src="resources-client.js" charset="UTF-8"></script>
+    </head>
 <body>
-<h1 id=selectedRows>Archi Views Telecom Model</h1>
-<div id="myGrid" style="height: 120px; width:900px;" class="ag-theme-balham"></div>
 
-<script type="text/javascript" charset="utf-8">
+    <div style="height: 100%; padding-top: 30px; box-sizing: border-box;">
+        <div id="myGrid" class="ag-theme-balham" style="height: 100%;"></div>
+    </div>
 
-    const columnDefs = [
-        {headerName: 'id', field: 'id', hide:true },
-        {headerName: 'name', field: 'name' , resizable: true, sortable: true},
-        {headerName: 'documentation', field: 'documentation', editable : true, resizable: true, sortable: true},
-        {headerName: 'viewpoint', field: 'viewpoint', resizable: true, sortable: true},
-    ];
-    const rowData = getSQL("/getview");
+    <div style="position: absolute; top: 0px; left: 0px;">
+        <input type="text" id="filter-text-box" placeholder="Filter..." oninput="onFilterTextBoxChanged()"/>
+    </div>
 
-    const gridOptions = {
-        columnDefs: columnDefs,
-        rowData: rowData,
-        rowSelection: 'single',
-        onSelectionChanged: onSelectionChanged
-    };
-    const eGridDiv = document.querySelector('#myGrid');
-
-
-    new agGrid.Grid(eGridDiv, gridOptions);
+    <script>
 
 
 
-    function onSelectionChanged() {
-    var selectedRows = gridOptions.api.getSelectedRows();
-    var selectedRowsString = '';
-    selectedRows.forEach( function(selectedRow, index) {
-        if (index!==0) {
-            selectedRowsString += ', ';
-        }
-        selectedRowsString += selectedRow.id;
-    });
-    //console.log(selectedRowsString);
-    document.querySelector('#selectedRows').innerHTML = selectedRowsString;
+var columnDefs = [
+    {headerName: "id", field: "id", hide: true},
+    {headerName: "folder", field: "folder", width: 120, rowGroup:true},
+    {headerName: "name", field: "name", width: 90},
+    {headerName: "documentation", field: "documentation", width: 110},
+    {headerName: "viewpoint", field: "viewpoint", width: 200}
+];
+
+const rowData = getSQL("/get?id=3");
 
 
-    }
+var gridOptions = {
+    defaultColDef: {
+        sortable: true,
+        filter: true
+    },
+    rowData: rowData,
+    columnDefs: columnDefs,
+    animateRows: true,
+    enableRangeSelection: true,
+};
 
-</script>
+        var gridDiv = document.querySelector('#myGrid');
+        new agGrid.Grid(gridDiv, gridOptions);
+
+        function onFilterTextBoxChanged() {
+    gridOptions.api.setQuickFilter(document.getElementById('filter-text-box').value);
+}
+
+    </script>
 </body>
+
+
+
 </html>

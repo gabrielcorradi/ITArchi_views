@@ -1,29 +1,32 @@
 <html>
-<head>
-    <script type="text/javascript"  src="/node_modules/gojs/release/go.js" charset="UTF-8"></script>
-    <script type="text/javascript"  src="/node_modules/gojs/extensions/Figures.js" charset="UTF-8"></script>
+    
+    <head>
+        <script type="text/javascript"  src="/node_modules/gojs/release/go.js" charset="UTF-8"></script>
+        <script type="text/javascript"  src="/node_modules/gojs/extensions/Figures.js" charset="UTF-8"></script>
 
-    <script type="text/javascript"  src="resources-client.js" charset="UTF-8"></script>
+        <script type="text/javascript"  src="resources-client.js" charset="UTF-8"></script>
 
-    <script src="/node_modules/ag-grid-community/dist/ag-grid-community.min.noStyle.js"></script>
-    <script type="text/javascript"  src="resources-client.js" charset="UTF-8"></script>
-    <link rel="stylesheet" href="/node_modules/ag-grid-community/dist/styles/ag-grid.css">
-    <link rel="stylesheet" href="/node_modules/ag-grid-community/dist/styles/ag-theme-balham.css">
+        <script src="/node_modules/ag-grid-enterprise/dist/ag-grid-enterprise.min.js"></script>
 
-</head>
+        <!--link rel="stylesheet" href="/node_modules/ag-grid-community/dist/styles/ag-grid.css">
+        <link rel="stylesheet" href="/node_modules/ag-grid-community/dist/styles/ag-theme-balham.css"-->
+    </head>
 
-    <h1 id=selectedRows>Archi Views Telecom Model</h1>
 
-    <div style="width: 100%; display: table;">
-        <div style="display: table-row">
-            <div id="myGrid" style="height: 120px; width:900px; display: table-cell;" class="ag-theme-balham"></div>
-            <div style="height: 120px; width:300px; display: table-cell;">
-                <button id="loadbutton" onclick="LoadDiagram()" disabled>Load Diagram</button>
-            </div>
-        </div>
+    <div>
+        <p style = "font-family:georgia,garamond,serif;font-size:20px;font-style:italic;" id=selectedRows>Archi Views Telecom Model</p>
+        <p style = "font-family:georgia,garamond,serif;font-size:12px;font-style:italic;" id=selectedRows2>documentation</p>
     </div>
 
-    <div id="myDiagramDiv" style="width:1900px; height:700px; background-color: #DAE4E4;"></div>
+        <input type="text" id="filter-text-box" placeholder="Filter..." oninput="onFilterTextBoxChanged()"/>
+        <button id="loadbutton" onclick="LoadDiagram()" disabled>Load Diagram</button>
+    
+   
+
+    <div id="myGrid" style="height:150px; width:1500px; display: table-cell;" class="ag-theme-balham"></div>
+         
+    <div id="myDiagramDiv" style="height:550px; width:1500px; background-color: #DAE4E4;"></div>
+    
 
     <script >
 
@@ -122,34 +125,7 @@
                                         )
                                     );
 
-
-             myDiagram.click = function(e) {e.diagram.commit(function(d) { d.clearHighlighteds(); }, "no highlighteds");};
-
-  
-
-                
-
-/*
-         myDiagram.groupTemplate =  $(go.Group, "Auto", 
-
-                                    $(go.Shape, "Rectangle", { fill: "orange", stroke: "darkorange" }),
-                                        $(go.Panel, "Table", { margin: 0.5 }, 
-
-                                            $(go.RowColumnDefinition, { row: 0, background: "white" }),
-                                                $("SubGraphExpanderButton", { row: 0, column: 0, margin: 3 }),
-                                                $(go.TextBlock, { row: 0, column: 1, font: "bold 14px Sans-Serif", stroke: "darkorange", textAlign: "center", stretch: go.GraphObject.Horizontal },
-                                                    new go.Binding("text", "name")),
-                                                $(go.Placeholder, { row: 1, columnSpan: 2, padding: 10, alignment: go.Spot.TopLeft },
-                                                    new go.Binding("location", "loc", go.Point.parse).makeTwoWay(go.Point.stringify),
-                                                    new go.Binding("desiredSize", "size", go.Size.parse).makeTwoWay(go.Size.stringify),
-
-                                                    new go.Binding("padding", "isSubGraphExpanded", function(exp) { return exp ? 10 : 0; } ).ofObject())
-                                        )
-                                    );
-  */
-
-
-        //myDiagram.model = new go.GraphLinksModel(getSQL("/getobj"), getSQL("/getrel"));
+        myDiagram.click = function(e) {e.diagram.commit(function(d) { d.clearHighlighteds(); }, "no highlighteds");};
 
         function selectstroke(node) {
 
@@ -183,7 +159,6 @@
             return rta;
             
         }
-
 
         function selectfig(node) { 
 
@@ -236,52 +211,55 @@
             return rta;
         }
 
-
     </script>
 
     <script type="text/javascript" charset="utf-8">
 
         var selectedRowsString = '';
-
-        const columnDefs = [
-            {headerName: 'id', field: 'id', hide:true },
-            {headerName: 'name', field: 'name' , resizable: true, sortable: true},
-            {headerName: 'documentation', field: 'documentation', editable : true, resizable: true, sortable: true},
-            {headerName: 'viewpoint', field: 'viewpoint', resizable: true, sortable: true},
+       
+        var columnDefs = [
+            {headerName: "id", field: "id", hide: true},
+            {headerName: "folder", field: "folder", width: 120, rowGroup:true},
+            {headerName: "name", field: "name", width: 90, resizable: true},
+            {headerName: "documentation", field: "documentation", width: 110, resizable: true},
+            {headerName: "viewpoint", field: "viewpoint", width: 200}
         ];
-        const rowData = getSQL("/get?id=2");
 
-        const gridOptions = {
-            columnDefs: columnDefs,
+        const rowData = getSQL("/get?id=3");
+
+
+        var gridOptions = {
+            defaultColDef: {
+                sortable: true,
+                filter: true
+            },
             rowData: rowData,
+            columnDefs: columnDefs,
+            animateRows: true,
+            enableRangeSelection: true,
             rowSelection: 'single',
             onSelectionChanged: onSelectionChanged
         };
-        const eGridDiv = document.querySelector('#myGrid');
 
+        var gridDiv = document.querySelector('#myGrid');
+        new agGrid.Grid(gridDiv, gridOptions);
 
-        new agGrid.Grid(eGridDiv, gridOptions);
+        function onFilterTextBoxChanged() {
+            gridOptions.api.setQuickFilter(document.getElementById('filter-text-box').value);
+        }
 
         function onSelectionChanged() {
-        var selectedRows = gridOptions.api.getSelectedRows();
+            var selectedRows = gridOptions.api.getSelectedRows();
 
-        selectedRows.forEach( function(selectedRow, index) {
-           /* 
-           if (index!==0) {
-                selectedRowsString += ', ';
-            }
-            selectedRowsString += selectedRow.id;
-            */
-            selectedRowsString = selectedRow.id;
-
-            document.querySelector('#selectedRows').innerHTML = selectedRow.name;
-        });
-        //console.log(selectedRowsString);
-        document.getElementById("loadbutton").disabled = false;
-       
-
-
+            selectedRows.forEach( function(selectedRow, index) {
+                selectedRowsString = selectedRow.id;
+                document.querySelector('#selectedRows').innerHTML = selectedRow.name;
+                document.querySelector('#selectedRows2').innerHTML = selectedRow.documentation;
+            });
+            //console.log("+++++++++++++++++++++++" + selectedRows);
+            document.getElementById("loadbutton").disabled = false;
         }
+
 
     </script>
 
@@ -290,14 +268,6 @@
             document.getElementById("loadbutton").disabled = true;
             myDiagram.model = new go.GraphLinksModel(getSQL("/get?id=0&view=" + selectedRowsString), getSQL("/get?id=1&view=" + selectedRowsString));
             document.getElementById("loadbutton").disabled = false;
-
-            /*
-            myDiagram.model.Fc.forEach(
-                function(e){
-                    console.log(e.loc + "\t" + e.name + "\t" + e.isGroup);}
-            )
-            */
-
         }
     </script>
 
