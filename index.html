@@ -41,8 +41,8 @@
         //myDiagram.layout = new go.LayeredDigraphLayout();
 
         myDiagram.nodeTemplate = $(
-            go.Node, 
-            { fromSpot: go.Spot.AllSides, toSpot: go.Spot.AllSides }, 
+            go.Node,
+            
             
             new go.Binding("location", "loc", go.Point.parse),
             
@@ -59,7 +59,7 @@
                 diagram.commitTransaction("highlight");}
             },
 
-            $(go.Shape, new go.Binding("figure", selectfig ),
+            $(go.Shape, new go.Binding("figure", selectfig ),  { fromSpot: go.Spot.AllSides, toSpot: go.Spot.AllSides, portId: "" },
 
                 new go.Binding("fill", selectstroke ),
 
@@ -79,6 +79,15 @@
 
             myDiagram.linkTemplate = $(go.Link,
 
+            { click: function(e, link) {
+                var diagram = link.diagram;
+                diagram.startTransaction("highlight");
+                diagram.clearHighlighteds();
+                link.isHighlighted = true;
+                diagram.commitTransaction("highlight");}
+            },
+
+
                                         { routing: go.Link.AvoidsNodes, corner: 10, curve: go.Link.JumpOver },
                                         $(go.Shape, 
                                           //  new go.Binding("stroke", "isHighlighted", function(h) { return h ? "red" : "black"; }).ofObject(),
@@ -90,7 +99,9 @@
                                             new go.Binding("opacity", "isHighlighted", function(h) { return h ? 0.5 : 0.3; }).ofObject()
                                         ),
                                         $(go.TextBlock, new go.Binding("text", "rel_name"), {font: "10pt Courier New"},
-                                        //{  segmentOrientation: go.Link.OrientAlong, width: 200, wrap: go.TextBlock.WrapDesiredSize, textAlign: "center", verticalAlignment: go.Spot.Center, margin: 1 ,isMultiline: true},
+                                        {  segmentOffset: new go.Point(0, -10), segmentOrientation: go.Link.OrientUpright, // width: 400,
+                                        //    wrap: go.TextBlock.WrapDesiredSize, textAlign: "center",  verticalAlignment: go.Spot.Center, margin: 1 ,isMultiline: true
+                                        },
                                             //new go.Binding("stroke", "isHighlighted", function(h) { return h ? "red" : "black"; }).ofObject(),
                                             //new go.Binding("font", "isHighlighted", function(h) { return h ? "11pt Courier New" : "9pt Courier New"; }).ofObject(),
                                             new go.Binding("strokeWidth", "isHighlighted", function(h) { return h ? 3 : 1; }).ofObject(),
