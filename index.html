@@ -91,19 +91,25 @@
             },
 
 
-                                        { routing: go.Link.AvoidsNodes, corner: 10, curve: go.Link.JumpOver },
+                              //  { routing: go.Link.Orthogonal, corner: 50, curve: go.Link.JumpOver, adjusting: go.Link.End,
+                              //  fromEndSegmentLength:5, toEndSegmentLength:5 , toShortLength:0,   reshapable: true, resegmentable: true},
+
+                              { routing: go.Link.AvoidsNodes, corner: 90, curve: go.Link.JumpOver, adjusting: go.Link.End },
+
                                         $(go.Shape, 
+                                        //{ segmentIndex: 0, segmentFraction :0.1 },
+
                                           //  new go.Binding("stroke", "isHighlighted", function(h) { return h ? "red" : "black"; }).ofObject(),
                                             new go.Binding("strokeWidth", "isHighlighted", function(h) { return h ? 3 : 1; }).ofObject(),
                                             new go.Binding("opacity", "isHighlighted", function(h) { return h ? 0.5 : 0.3; }).ofObject()
                                          ),
-                                        $(go.Shape, { toArrow: "Standard" },
+                                        $(go.Shape, { toArrow: "Triangle" },
                                             new go.Binding("strokeWidth", "isHighlighted", function(h) { return h ? 3 : 1; }).ofObject(),
                                             new go.Binding("opacity", "isHighlighted", function(h) { return h ? 0.5 : 0.3; }).ofObject()
                                         ),
                                         $(go.TextBlock, new go.Binding("text", "rel_name"), {font: "10pt Courier New"},
-                                        {  segmentOffset: new go.Point(0, -10), segmentOrientation: go.Link.OrientUpright, // width: 400,
-                                        //    wrap: go.TextBlock.WrapDesiredSize, textAlign: "center",  verticalAlignment: go.Spot.Center, margin: 1 ,isMultiline: true
+                                        {  segmentOffset: new go.Point(0, -10), segmentOrientation: go.Link.OrientUpright, width: 100, isMultiline: true
+                                        //    wrap: go.TextBlock.WrapDesiredSize, textAlign: "center",  verticalAlignment: go.Spot.Center, margin: 1
                                         },
                                             //new go.Binding("stroke", "isHighlighted", function(h) { return h ? "red" : "black"; }).ofObject(),
                                             //new go.Binding("font", "isHighlighted", function(h) { return h ? "11pt Courier New" : "9pt Courier New"; }).ofObject(),
