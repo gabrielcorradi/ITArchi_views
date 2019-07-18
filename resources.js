@@ -64,7 +64,7 @@ module.exports = {
         if(params.id==0) rta[0] = defgroups(rta[0], params.view);
         if(params.id==1) rta[0] = deflinks(rta[0]);
 
-       // console.log(JSON.stringify(rta[0]));
+        console.log(JSON.stringify(rta[0]));
         res.end(JSON.stringify( rta[0] ));
   },
 
