@@ -1,4 +1,4 @@
-FROM node:v12.6-sli
+FROM node:latest
 
 # Create app directory
 WORKDIR /usr/src/app
@@ -8,6 +8,9 @@ WORKDIR /usr/src/app
 # where available (npm@5+)
 COPY package*.json ./
 
+RUN npm config set proxy http://10.75.28.11:2000
+RUN npm config set https-proxy http://10.75.28.11:2000
+
 RUN npm install
 # If you are building your code for production
 # RUN npm ci --only=production
@@ -15,5 +18,5 @@ RUN npm install
 # Bundle app source
 COPY . .
 
-EXPOSE 8080
+EXPOSE 5000
 CMD [ "node", "index.js" ]
