@@ -1,0 +1,17 @@
+{
+    "name": "ITArq_web_app",
+    "version": "1.0.0",
+    "description": "Consultas de vistas del modelo de arquitectura Telecom",
+    "author": "ghcorradi@teco.com.ar",
+    "main": "index.js",
+    "scripts": {
+      "start": "node index.js"
+    },
+    "dependencies": {
+      "gojs": "^v2.0.14",
+      "ag-grid-enterprise": "^v21.0.1",
+      "mysql2": "^v1.6.5",
+      "mime": "^v2.4.4"
+    }
+  }
+  
