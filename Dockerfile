@@ -1,5 +1,5 @@
-FROM node:latest
-
+# FROM node:latest
+FROM docker-registry.default.svc:5000/openshift/nodejs@sha256:089f59c57fcb1629d589333f726663496ac98fd49f98bbb1e4cf5f2483e84da7
 # Create app directory
 WORKDIR /usr/src/app
 
