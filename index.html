@@ -21,7 +21,21 @@
         <input type="text" id="filter-text-box" placeholder="Filter..." oninput="onFilterTextBoxChanged()"/>
         <button id="loadbutton" onclick="LoadDiagram()" disabled>Load Diagram</button>
     
-   
+        
+        <form>
+            <p>Select relationships type</p>
+            <label class="radio-inline">
+              <input type="radio" name="optradio" checked>Option 1
+            </label>
+            <label class="radio-inline">
+              <input type="radio" name="optradio">Option 2
+            </label>
+            <label class="radio-inline">
+              <input type="radio" name="optradio">Option 3
+            </label>
+          </form>
+    
+
 
     <div id="myGrid" style="height:150px; width:1500px; display: table-cell;" class="ag-theme-balham"></div>
          
@@ -73,8 +87,11 @@
 
                // { parameter1: 14, fill: "rgba(128,128,128,0.33)" },
                 new go.Binding("desiredSize", "size", go.Size.parse).makeTwoWay(go.Size.stringify) ),
-            $(go.TextBlock, new go.Binding("text", "name"), { width: 100, wrap: go.TextBlock.WrapDesiredSize,
-             textAlign: "center", verticalAlignment: go.Spot.Center, margin: 1 ,isMultiline: true} ),
+            $(go.TextBlock, new go.Binding("text", "name"), 
+                new go.Binding("width",  function(node) { return parseInt(node.size.split(" ")[0]); }),
+                new go.Binding("height",  function(node) { return parseInt(node.size.split(" ")[1]); }),
+                //{ wrap: go.TextBlock.WrapDesiredSize,
+                { textAlign: "center", verticalAlignment: go.Spot.Center, isMultiline: true } ),
 
             { toolTip: $("ToolTip", $(go.TextBlock, { margin: 4 }, new go.Binding("text", "element_class")))}
 
@@ -90,11 +107,15 @@
                 diagram.commitTransaction("highlight");}
             },
 
+                                
+                // routing: go.Link.Normal, Orthogonal, or AvoidsNodes.
+
+
 
                               //  { routing: go.Link.Orthogonal, corner: 50, curve: go.Link.JumpOver, adjusting: go.Link.End,
                               //  fromEndSegmentLength:5, toEndSegmentLength:5 , toShortLength:0,   reshapable: true, resegmentable: true},
 
-                              { routing: go.Link.AvoidsNodes, corner: 90, curve: go.Link.JumpOver, adjusting: go.Link.End },
+                              { routing: go.Link.Orthogonal, corner: 90, curve: go.Link.JumpOver, adjusting: go.Link.End },
 
                                         $(go.Shape, 
                                         //{ segmentIndex: 0, segmentFraction :0.1 },
@@ -121,7 +142,14 @@
 
              myDiagram.groupTemplate =   $(go.Group, "Vertical", 
                                         { selectionObjectName: "PH", locationObjectName: "PH", resizable: true, resizeObjectName: "PH" },
-                                        $(go.TextBlock, { font: "Bold 10pt Sans-Serif", width: 300, wrap: go.TextBlock.WrapFit }, new go.Binding("text", "name")),
+
+
+                                        $(go.TextBlock, 
+                                       { font: "Bold 10pt Sans-Serif", width: 300, wrap: go.TextBlock.WrapFit }, new go.Binding("text", "name")),
+                                        
+
+                                        
+                                        
                                         new go.Binding("location", "loc", go.Point.parse).makeTwoWay(go.Point.stringify),
                                         $(go.Shape, { name: "PH" }, 
                                             new go.Binding("desiredSize", "size", go.Size.parse).makeTwoWay(go.Size.stringify),
