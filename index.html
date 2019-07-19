@@ -132,7 +132,7 @@
                               //  fromEndSegmentLength:5, toEndSegmentLength:5 , toShortLength:0,   reshapable: true, resegmentable: true},
 
                               new go.Binding("routing", function() 
-                              {  if(diagram_route.elements["test"].value==0) return go.Link.Normal; else return go.Link.Orthogonal;} ),
+                              {  if(diagram_route.elements["test"].value==0) return go.Link.Normal; else return go.Link.AvoidsNodes;} ),
                                { corner: 90, curve: go.Link.JumpOver, adjusting: go.Link.End },
 
                                         $(go.Shape, 
