@@ -21,41 +21,41 @@
         <input type="text" id="filter-text-box" placeholder="Filter..." oninput="onFilterTextBoxChanged()"/>
         <button id="loadbutton" onclick="LoadDiagram()" disabled>Load Diagram</button>
     
-        
-        <form>
-            <p>Select relationships type</p>
-            <label class="radio-inline">
-              <input type="radio" name="optradio" checked>Option 1
-            </label>
-            <label class="radio-inline">
-              <input type="radio" name="optradio">Option 2
-            </label>
-            <label class="radio-inline">
-              <input type="radio" name="optradio">Option 3
-            </label>
-          </form>
+        <form id="test">
+            <label><input type="radio" name="test" value=0 checked> Lineal</label>
+            <label><input type="radio" name="test" value=1> Orthogonal</label>
+        </form>
     
 
+        <form id="test2">
+            <label><input type="radio" name="test2" value=0 checked> Normal</label>
+            <label><input type="radio" name="test2" value=1> GridLayout</label>
+            <label><input type="radio" name="test2" value=2> TreeLayout</label>
+            <label><input type="radio" name="test2" value=3> ForceDirectedLayout</label>
+            <label><input type="radio" name="test2" value=4> LayeredDigraphLayout</label>
+            <label><input type="radio" name="test2" value=5> CircularLayout</label>
+        </form>
+            
 
     <div id="myGrid" style="height:150px; width:1500px; display: table-cell;" class="ag-theme-balham"></div>
          
     <div id="myDiagramDiv" style="height:550px; width:1500px; background-color: #DAE4E4;"></div>
     
+    <script>
+        //globals
+        var diagram_route = document.getElementById("test");
+        var diagram_layout = document.getElementById("test2");
+
+    </script>
+
 
     <script >
 
         var $ = go.GraphObject.make;
         var myDiagram = $(go.Diagram, "myDiagramDiv",{ "undoManager.isEnabled": true });
 
-/*
-    GridLayout
-    TreeLayout
-    ForceDirectedLayout
-    LayeredDigraphLayout
-    CircularLayout
-*/
 
-        //myDiagram.layout = new go.LayeredDigraphLayout();
+
 
         myDiagram.nodeTemplate = $(
             go.Node,
@@ -93,9 +93,15 @@
                 //{ wrap: go.TextBlock.WrapDesiredSize,
                 { textAlign: "center", verticalAlignment: go.Spot.Center, isMultiline: true } ),
 
-            { toolTip: $("ToolTip", $(go.TextBlock, { margin: 4 }, new go.Binding("text", "element_class")))}
+            { toolTip: $("ToolTip", $(go.TextBlock, { margin: 4 }, new go.Binding("text", "element_class" )))}
 
             );
+
+            
+
+            
+            
+
 
             myDiagram.linkTemplate = $(go.Link,
 
@@ -110,12 +116,12 @@
                                 
                 // routing: go.Link.Normal, Orthogonal, or AvoidsNodes.
 
-
-
                               //  { routing: go.Link.Orthogonal, corner: 50, curve: go.Link.JumpOver, adjusting: go.Link.End,
                               //  fromEndSegmentLength:5, toEndSegmentLength:5 , toShortLength:0,   reshapable: true, resegmentable: true},
 
-                              { routing: go.Link.Orthogonal, corner: 90, curve: go.Link.JumpOver, adjusting: go.Link.End },
+                              new go.Binding("routing", function() 
+                              {  if(diagram_route.elements["test"].value==0) return go.Link.Normal; else return go.Link.Orthogonal;} ),
+                               { corner: 90, curve: go.Link.JumpOver, adjusting: go.Link.End },
 
                                         $(go.Shape, 
                                         //{ segmentIndex: 0, segmentFraction :0.1 },
@@ -291,8 +297,10 @@
                 document.querySelector('#selectedRows').innerHTML = selectedRow.name;
                 document.querySelector('#selectedRows2').innerHTML = selectedRow.documentation;
             });
-            //console.log("+++++++++++++++++++++++" + selectedRows);
+            
             document.getElementById("loadbutton").disabled = false;
+
+            
         }
 
 
@@ -301,6 +309,38 @@
     <script type="text/javascript" charset="utf-8">
         function LoadDiagram(){
             document.getElementById("loadbutton").disabled = true;
+
+        
+            /*
+                GridLayout
+                TreeLayout
+                ForceDirectedLayout
+                LayeredDigraphLayout
+                CircularLayout
+
+
+            */
+
+
+            switch(diagram_layout.elements["test2"].value) {
+                case "0":
+                    myDiagram.layout = new go.Layout(); break;
+                case "1":
+                    myDiagram.layout = new go.GridLayout(); break;
+                case "2":
+                    myDiagram.layout = new go.TreeLayout(); break;
+                case "3":
+                    myDiagram.layout = new go.ForceDirectedLayout(); break;
+                case "4":
+                    myDiagram.layout = new go.LayeredDigraphLayout(); break;
+                case "5":
+                    myDiagram.layout = new go.CircularLayout(); break;
+
+                default: 
+
+            }
+
+
             myDiagram.model = new go.GraphLinksModel(getSQL("/get?id=0&view=" + selectedRowsString), getSQL("/get?id=1&view=" + selectedRowsString));
             document.getElementById("loadbutton").disabled = false;
         }
