@@ -4,6 +4,18 @@
         <script type="text/javascript"  src="/node_modules/gojs/release/go.js" charset="UTF-8"></script>
         <script type="text/javascript"  src="/node_modules/gojs/extensions/Figures.js" charset="UTF-8"></script>
 
+
+
+        <!--script type="text/javascript"  src="/node_modules/gojs/extensions/FishboneLayout.js" charset="UTF-8"></script>
+        <script type="text/javascript"  src="/node_modules/gojs/extensions/ParallelLayout.js" charset="UTF-8"></script>
+        <script type="text/javascript"  src="/node_modules/gojs/extensions/RadialLayout.js" charset="UTF-8"></script>
+        <script type="text/javascript"  src="/node_modules/gojs/extensions/SerpentineLayout.js" charset="UTF-8"></script>
+        <script type="text/javascript"  src="/node_modules/gojs/extensions/SpiralLayout.js" charset="UTF-8"></script>
+        <script type="text/javascript"  src="/node_modules/gojs/extensions/TableLayout.js" charset="UTF-8"></script>
+        <script type="text/javascript"  src="/node_modules/gojs/extensions/TreeMapLayout.js" charset="UTF-8"></script-->
+
+
+
         <script type="text/javascript"  src="resources-client.js" charset="UTF-8"></script>
 
         <script src="/node_modules/ag-grid-enterprise/dist/ag-grid-enterprise.min.js"></script>
@@ -162,7 +174,8 @@
                                             new go.Binding("figure", selectfig ),
                                             new go.Binding("fill", selectstroke ),
                                             { toolTip: $("ToolTip", $(go.TextBlock, { margin: 4 }, new go.Binding("text", "element_class")))}
-                                        )
+                                           )
+
                                     );
 
         myDiagram.click = function(e) {e.diagram.commit(function(d) { d.clearHighlighteds(); }, "no highlighteds");};
@@ -318,6 +331,15 @@
                 LayeredDigraphLayout
                 CircularLayout
 
+                extensions
+                -------------
+                FishboneLayout.js
+                ParallelLayout.js
+                RadialLayout.js
+                SerpentineLayout.js
+                SpiralLayout.js
+                TableLayout.js
+                TreeMapLayout.js
 
             */
 
