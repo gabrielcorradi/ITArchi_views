@@ -70,8 +70,8 @@ module.exports = {
 
   mysqlfx: async function(SQLquery){
 
-    //    var host = 'mysql.eclipse-che.svc.cluster.local';
-    var host = '10.75.28.17';
+    var host = 'mysql3';
+//    var host = '10.75.28.17';
 
     const conn = await mysql.createConnection({
         host : host,
