@@ -70,7 +70,7 @@ module.exports = {
 
   mysqlfx: async function(SQLquery){
 
-    var host = 'mysql3';
+    var host = 'mysql2';
 //    var host = '10.75.28.17';
 
     const conn = await mysql.createConnection({
