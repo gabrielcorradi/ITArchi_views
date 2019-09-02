@@ -19,6 +19,7 @@ http.createServer(function (req, res) {
         case "/":
             tools.homepage(req, res);
             break;
+            
         case "/test":
             tools.test(req, res);
             break;

@@ -1,67 +1,98 @@
-<html>
-    
+<!DOCTYPE html>
+<html lang="en">
     <head>
+        <script> var __basePath = ''; </script>
+        <style> html, body { margin: 0; padding: 0; height: 100%; } </style>
+
         <script type="text/javascript"  src="/node_modules/gojs/release/go.js" charset="UTF-8"></script>
         <script type="text/javascript"  src="/node_modules/gojs/extensions/Figures.js" charset="UTF-8"></script>
 
-
-
-        <!--script type="text/javascript"  src="/node_modules/gojs/extensions/FishboneLayout.js" charset="UTF-8"></script>
-        <script type="text/javascript"  src="/node_modules/gojs/extensions/ParallelLayout.js" charset="UTF-8"></script>
-        <script type="text/javascript"  src="/node_modules/gojs/extensions/RadialLayout.js" charset="UTF-8"></script>
-        <script type="text/javascript"  src="/node_modules/gojs/extensions/SerpentineLayout.js" charset="UTF-8"></script>
-        <script type="text/javascript"  src="/node_modules/gojs/extensions/SpiralLayout.js" charset="UTF-8"></script>
-        <script type="text/javascript"  src="/node_modules/gojs/extensions/TableLayout.js" charset="UTF-8"></script>
-        <script type="text/javascript"  src="/node_modules/gojs/extensions/TreeMapLayout.js" charset="UTF-8"></script-->
-
-
-
+        <script src="/node_modules/ag-grid-enterprise/dist/ag-grid-enterprise.min.js"></script>
         <script type="text/javascript"  src="resources-client.js" charset="UTF-8"></script>
 
-        <script src="/node_modules/ag-grid-enterprise/dist/ag-grid-enterprise.min.js"></script>
 
-        <!--link rel="stylesheet" href="/node_modules/ag-grid-community/dist/styles/ag-grid.css">
-        <link rel="stylesheet" href="/node_modules/ag-grid-community/dist/styles/ag-theme-balham.css"-->
     </head>
+    <body onload="LoadData1();">
+
+        <div style="border: 1px solid #000000;">
+            <input type="text" id="filter-text-box" placeholder="Filter..." oninput="onFilterTextBoxChanged()"/>
+            <button id="loadbutton" onclick="LoadDiagram()" disabled>Load Diagram</button>
+            <p style = "font-family:georgia,garamond,serif;font-size:20px;font-style:italic;" id=selectedRows>Archi Views Telecom Model</p>
+            <p style = "font-family:georgia,garamond,serif;font-size:14px;font-style:italic;" id=selectedRows2></p>
+            <div>
+                <form id="test" style="display: inline-block; margin-right: 100px;">
+                    <label><input type="radio" name="test" value=0 checked> Lineal</label>
+                    <label><input type="radio" name="test" value=1> Orthogonal</label>
+                </form>
+                <form id="test2" style="display: inline-block; ; margin-right: 100px;">
+                    <label><input type="radio" name="test2" value=0 checked> Normal</label>
+                    <label><input type="radio" name="test2" value=1> GridLayout</label>
+                    <label><input type="radio" name="test2" value=2> TreeLayout</label>
+                    <label><input type="radio" name="test2" value=3> ForceDirectedLayout</label>
+                    <label><input type="radio" name="test2" value=4> LayeredDigraphLayout</label>
+                    <label><input type="radio" name="test2" value=5> CircularLayout</label>
+                </form>
+                <form id="test3" style="display: inline-block;">
+                    <label><input type="radio" name="test3" value=0 onclick="LoadData2();" checked> Archi Views </label>
+                    <label><input type="radio" name="test3" value=1 onclick="LoadData2();"> Infra Views</label>
+                </form>
+            </div>
+
+        </div>
+
+        <div style="height: 100%; width: 100%; display: flex;">
+            <div id="myGrid" style="width: 25%;" class="ag-theme-balham"></div>         
+            <div id="myDiagramDiv" style="width: 75%; ; background-color: #DAE4E4;"></div>
+        </div>
+
+        <script>
 
 
-    <div>
-        <p style = "font-family:georgia,garamond,serif;font-size:20px;font-style:italic;" id=selectedRows>Archi Views Telecom Model</p>
-        <p style = "font-family:georgia,garamond,serif;font-size:12px;font-style:italic;" id=selectedRows2>documentation</p>
-    </div>
 
-        <input type="text" id="filter-text-box" placeholder="Filter..." oninput="onFilterTextBoxChanged()"/>
-        <button id="loadbutton" onclick="LoadDiagram()" disabled>Load Diagram</button>
-    
-        <form id="test">
-            <label><input type="radio" name="test" value=0 checked> Lineal</label>
-            <label><input type="radio" name="test" value=1> Orthogonal</label>
-        </form>
-    
 
-        <form id="test2">
-            <label><input type="radio" name="test2" value=0 checked> Normal</label>
-            <label><input type="radio" name="test2" value=1> GridLayout</label>
-            <label><input type="radio" name="test2" value=2> TreeLayout</label>
-            <label><input type="radio" name="test2" value=3> ForceDirectedLayout</label>
-            <label><input type="radio" name="test2" value=4> LayeredDigraphLayout</label>
-            <label><input type="radio" name="test2" value=5> CircularLayout</label>
-        </form>
-            
 
-    <div id="myGrid" style="height:150px; width:1500px; display: table-cell;" class="ag-theme-balham"></div>
-         
-    <div id="myDiagramDiv" style="height:550px; width:1500px; background-color: #DAE4E4;"></div>
-    
-    <script>
+
+
+        var rowData;
+
+        var columnDefs = [
+                {headerName: "id", field: "id", hide: true},
+                {headerName: "folder", field: "folder", width: 100, rowGroup:true, hide: true},
+                {headerName: "name", field: "name", width: 300},
+                {headerName: "documentation", field: "documentation", width: 110, hide: true},
+                {headerName: "viewpoint", field: "viewpoint", width: 200, hide: true}
+            ];
+
+
+        var gridOptions = {
+                defaultColDef: {
+                    sortable: true,
+                    filter: true
+                },
+                rowData: rowData,
+                columnDefs: columnDefs,
+                animateRows: true,
+                enableRangeSelection: true,
+                rowSelection: 'single',
+                onSelectionChanged: onSelectionChanged
+            };
+
+
+
+
         //globals
-        var diagram_route = document.getElementById("test");
-        var diagram_layout = document.getElementById("test2");
+        diagram_route = document.getElementById("test");
+        diagram_layout = document.getElementById("test2");
+        diagram_views = document.getElementById("test3");
 
-    </script>
 
 
-    <script >
+
+
+
+
+
+
 
         var $ = go.GraphObject.make;
         var myDiagram = $(go.Diagram, "myDiagramDiv",{ "undoManager.isEnabled": true });
@@ -158,27 +189,14 @@
                                     );
 
 
-             myDiagram.groupTemplate =   $(go.Group, "Vertical", 
-                                        { selectionObjectName: "PH", locationObjectName: "PH", resizable: true, resizeObjectName: "PH" },
 
 
-                                        $(go.TextBlock, 
-                                       { font: "Bold 10pt Sans-Serif", width: 300, wrap: go.TextBlock.WrapFit }, new go.Binding("text", "name")),
-                                        
-
-                                        
-                                        
-                                        new go.Binding("location", "loc", go.Point.parse).makeTwoWay(go.Point.stringify),
-                                        $(go.Shape, { name: "PH" }, 
-                                            new go.Binding("desiredSize", "size", go.Size.parse).makeTwoWay(go.Size.stringify),
-                                            new go.Binding("figure", selectfig ),
-                                            new go.Binding("fill", selectstroke ),
-                                            { toolTip: $("ToolTip", $(go.TextBlock, { margin: 4 }, new go.Binding("text", "element_class")))}
-                                           )
-
-                                    );
 
         myDiagram.click = function(e) {e.diagram.commit(function(d) { d.clearHighlighteds(); }, "no highlighteds");};
+
+
+
+
 
         function selectstroke(node) {
 
@@ -190,9 +208,11 @@
                 case "ApplicationService":
                 case "ImplementationEvent":
                 case "Junction":
+                case "NodeInfra":
                     rta = "rgba(65, 218, 197 ,0.80)"; break;    // celeste
 
                 case "WorkPackage":
+                case "Database":
                     rta = "rgba(240, 95, 128 ,0.80)"; break;    // rosa
 
                 case null:
@@ -204,7 +224,10 @@
                 case "BusinessObject":
                 case "BusinessEvent":
                 case "BusinessInteraction":
-                    rta =  "rgba(255, 255, 100, 0.8)"; break;   // amarillo
+                    rta = "rgba(255, 255, 100, 0.8)"; break;   // amarillo
+
+                case "Site":
+                    rta = "rgba(255,165,0, 0.5)"; break;    // naranja
 
                 default:
                     rta = "rgba(128, 218, 65,0.50)"; break;     // verde
@@ -220,6 +243,10 @@
             switch(node.element_class) {
 //                case "ApplicationComponent":
 //                    rta = "Component"; break;
+                case "Database":
+                    rta = "Database"; break;
+
+
                 case "ApplicationService":
                     rta = "PrimitiveToCall"; break;
 
@@ -256,7 +283,11 @@
                     rta = "DividedProcess"; break;
 
                 case "Node":
+                case "NodeInfra":
                     rta = "Cube2"; break;
+
+                case "Site":
+                    rta = "Rectangle"; break;
 
                 default:
                     rta = "RoundedRectangle"; break;
@@ -265,65 +296,11 @@
             return rta;
         }
 
-    </script>
 
-    <script type="text/javascript" charset="utf-8">
-
-        var selectedRowsString = '';
-       
-        var columnDefs = [
-            {headerName: "id", field: "id", hide: true},
-            {headerName: "folder", field: "folder", width: 120, rowGroup:true,  hide: true},
-            {headerName: "name", field: "name", width: 90, resizable: true},
-            {headerName: "documentation", field: "documentation", width: 110, resizable: true},
-            {headerName: "viewpoint", field: "viewpoint", width: 200}
-        ];
-
-        const rowData = getSQL("/get?id=3");
-
-
-        var gridOptions = {
-            defaultColDef: {
-                sortable: true,
-                filter: true
-            },
-            rowData: rowData,
-            columnDefs: columnDefs,
-            animateRows: true,
-            enableRangeSelection: true,
-            rowSelection: 'single',
-            onSelectionChanged: onSelectionChanged
-        };
-
-        var gridDiv = document.querySelector('#myGrid');
-        new agGrid.Grid(gridDiv, gridOptions);
-
-        function onFilterTextBoxChanged() {
-            gridOptions.api.setQuickFilter(document.getElementById('filter-text-box').value);
-        }
-
-        function onSelectionChanged() {
-            var selectedRows = gridOptions.api.getSelectedRows();
-
-            selectedRows.forEach( function(selectedRow, index) {
-                selectedRowsString = selectedRow.id;
-                document.querySelector('#selectedRows').innerHTML = selectedRow.name;
-                document.querySelector('#selectedRows2').innerHTML = selectedRow.documentation;
-            });
-            
-            document.getElementById("loadbutton").disabled = false;
-
-            
-        }
-
-
-    </script>
-
-    <script type="text/javascript" charset="utf-8">
         function LoadDiagram(){
+
             document.getElementById("loadbutton").disabled = true;
 
-        
             /*
                 GridLayout
                 TreeLayout
@@ -363,9 +340,130 @@
             }
 
 
-            myDiagram.model = new go.GraphLinksModel(getSQL("/get?id=0&view=" + selectedRowsString), getSQL("/get?id=1&view=" + selectedRowsString));
+
+            if(diagram_views.elements["test3"].value==0){
+            
+            myDiagram.groupTemplate =   $(go.Group, "Vertical", 
+           { selectionObjectName: "PH", locationObjectName: "PH", resizable: true, resizeObjectName: "PH" },
+
+           $(go.TextBlock, 
+           { font: "Bold 10pt Sans-Serif", width: 300, wrap: go.TextBlock.WrapFit }, new go.Binding("text", "name")),
+                                       
+                                       
+           new go.Binding("location", "loc", go.Point.parse).makeTwoWay(go.Point.stringify),
+               $(go.Shape, { name: "PH" }, 
+               new go.Binding("desiredSize", "size", go.Size.parse).makeTwoWay(go.Size.stringify),
+               new go.Binding("figure", selectfig ),
+               new go.Binding("fill", selectstroke ),
+               { toolTip: $("ToolTip", $(go.TextBlock, { margin: 4 }, new go.Binding("text", "element_class")))}
+               ));
+       }
+   else{
+
+           myDiagram.groupTemplate =
+               $(go.Group, "Auto",
+               $(go.Shape, new go.Binding("figure", selectfig ), new go.Binding("fill", selectstroke ), // surrounds everything
+                   { parameter1: 10, fill: "rgba(128,128,128,0.33)" }),
+               $(go.Panel, "Vertical",  // position header above the subgraph
+                   { defaultAlignment: go.Spot.Left },
+                   $(go.Panel, "Horizontal",  // the header
+                   { defaultAlignment: go.Spot.Top },
+                   $("SubGraphExpanderButton"),  // this Panel acts as a Button
+                   $(go.TextBlock,     // group title near top, next to button
+                       { font: "Bold 12pt Sans-Serif" },
+                       new go.Binding("text", "name"))
+                   ),
+                   $(go.Placeholder,     // represents area for all member parts
+                   { padding: new go.Margin(0, 10) })//, background: "white" })
+               ));
+       }
+
+
+
+
+
+            if(diagram_views.elements["test3"].value==0)
+                myDiagram.model = new go.GraphLinksModel(getSQL("/get?id=0&view=" + selectedRowsString), getSQL("/get?id=1&view=" + selectedRowsString));
+            else
+                myDiagram.model = new go.GraphLinksModel(getSQL("/get?id=4&view=" + selectedRowsString));
+
+
             document.getElementById("loadbutton").disabled = false;
         }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        function LoadData1(){
+
+            rowData = getSQL("/get?id=3");
+
+            var gridDiv = document.querySelector('#myGrid');
+            new agGrid.Grid(gridDiv, gridOptions)
+
+
+//            gridOptions.api.setRowData([]);            
+            gridOptions.api.setRowData(rowData);
+
+
+
+        }
+
+        function onFilterTextBoxChanged() {
+                gridOptions.api.setQuickFilter(document.getElementById('filter-text-box').value);
+            }
+
+
+            function onSelectionChanged() {
+                var selectedRows = gridOptions.api.getSelectedRows();
+
+                selectedRows.forEach( function(selectedRow, index) {
+                    selectedRowsString = selectedRow.id;
+                    document.querySelector('#selectedRows').innerHTML = selectedRow.name;
+                    document.querySelector('#selectedRows2').innerHTML = selectedRow.documentation;
+                });
+                
+                document.getElementById("loadbutton").disabled = false;
+
+             }
+
+        function LoadData2(){
+
+            diagram_views = document.getElementById("test3");
+
+           
+            if(diagram_views.elements["test3"].value==0)
+                rowData = getSQL("/get?id=3");
+            else
+                rowData = getSQL("/get?id=5");
+
+            //console.log(JSON.stringify(rowData));
+           
+            gridOptions.api.setRowData(rowData);
+        }
+
     </script>
+
+</body>
+
+
 
 </html>

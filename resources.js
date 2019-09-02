@@ -51,6 +51,14 @@ module.exports = {
                         from views v, views_in_model vim \
                         where v.id = vim.view_id;"
 
+
+    query_vistas_4 =    "select Aplicacion name, ubicacion, `Modelo HW` hw, servidor, version , servicio ,hostname \
+                        from catalogo.`Mapeo Aplicativo 2019-06-03` where Aplicacion = '"+ params.view +"'";
+
+
+    query_vistas_5 =    "select Aplicacion id, 'Application' folder, '' documentation, '' viewpoint, Aplicacion name \
+                        from catalogo.`Mapeo Aplicativo 2019-06-03` group by name;"
+
         var query = [];
 
         query.push(query_vistas_0);
@@ -58,20 +66,25 @@ module.exports = {
         query.push(query_vistas_2);
         query.push(query_vistas_3);
 
+        query.push(query_vistas_4);
+        query.push(query_vistas_5);
+
 
         var rta = await this.mysqlfx(query[params.id]);
 
         if(params.id==0) rta[0] = defgroups(rta[0], params.view);
         if(params.id==1) rta[0] = deflinks(rta[0]);
 
-        console.log(JSON.stringify(rta[0]));
+        if(params.id==4) rta[0] = definfra(rta[0]);
+        
+        //console.log(JSON.stringify(rta[0]));
         res.end(JSON.stringify( rta[0] ));
   },
 
   mysqlfx: async function(SQLquery){
 
-  var host = 'mysql2';
-  //var host = '10.75.28.17';
+  //var host = 'mysql2';
+  var host = '10.75.28.17';
 
     const conn = await mysql.createConnection({
         host : host,
@@ -118,14 +131,11 @@ var defgroups = function (rta, view) {
 
   for (var key in rta) {
 
-    
     //if (rta[key].group == view) rta[key].isGroup = true;
     
     for (var key2 in rta) {
       if (rta[key].key == rta[key2].group) { rta[key].isGroup = true; break; }
     }
-    
-
 
     
     if (rta[key].group != view){ 
@@ -171,5 +181,59 @@ var deflinks = function (rta) {
   }
 
   return rta;
+
+}
+
+
+var definfra = function (rta){
+
+  var query = {};
+  var query2 = [];
+  
+  // Sites
+  for (var key in rta)
+      query[rta[key].ubicacion] = rta[key].name;
+  
+  // HW in sites
+  for (var key in rta)
+      query[rta[key].ubicacion + ";" + rta[key].hw.toUpperCase()] = rta[key].name;
+  
+  for (var key in query){
+      
+      if(key.search(";")<0)
+          // Sites
+          query2.push({ "key" : key, "isGroup" : "true" , "name" : key , "element_class" : "Site"});
+      else{
+          // HW in sites
+          query2.push({ "key" : key, "group" : key.split(";")[0], 
+                        "name" : key.split(";")[1].toUpperCase(),
+                        "isGroup" : "true"});
+      }
+  } 
+
+  for (var key in rta){
+
+
+
+    if (rta[key].servicio!="Base de Datos"){
+
+      query2.push({ "key" : rta[key].servidor.toUpperCase(), 
+      "group" :  rta[key].ubicacion + ";" + rta[key].hw.toUpperCase(), 
+      "name" : rta[key].servidor , "isGroup" : "true"});
+
+
+        query2.push({ "key" : rta[key].hostname, "element_class" : "NodeInfra",
+        "group" :  rta[key].servidor.toUpperCase(), 
+        "name" : rta[key].version });
+    }
+    else
+      query2.push({ "key" : rta[key].hostname, "element_class" : "Database",
+      "group" :  rta[key].hostname.toUpperCase(), 
+      "name" :  rta[key].version +  "\n\n[ " + rta[key].servidor + " ]" })
+
+  }
+
+
+  return query2;
 
 }
